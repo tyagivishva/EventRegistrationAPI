@@ -40,6 +40,22 @@ public class EventService : IEventService
         return campusEvent == null ? null : MapToDto(campusEvent);
     }
 
+    public async Task<EventDto> CreateAsync(CreateEventDto dto)
+    {
+        var campusEvent = new Event
+        {
+            Title = dto.Title,
+            Location = dto.Location,
+            EventDate = dto.EventDate,
+            Capacity = dto.Capacity
+        };
+
+        _context.Events.Add(campusEvent);
+        await _context.SaveChangesAsync();
+
+        return MapToDto(campusEvent);
+    }
+
     private static EventDto MapToDto(Event campusEvent)
     {
         var registeredCount = campusEvent.Registrations.Count;

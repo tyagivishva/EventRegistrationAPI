@@ -2,6 +2,7 @@
 // StudentId: 991811327
 
 using System.ComponentModel.DataAnnotations;
+using EventRegistrationAPI_VishvaTyagi.Validation;
 
 namespace EventRegistrationAPI_VishvaTyagi.DTOs;
 
@@ -19,6 +20,7 @@ public class CreateEventDto
     public string Location { get; set; } = string.Empty;
 
     [Required(ErrorMessage = "Event date is required.")]
+    [FutureDate(ErrorMessage = "Event date must be in the future.")]
     public DateTime EventDate { get; set; }
 
     [Range(1, 500, ErrorMessage = "Capacity must be between 1 and 500.")]

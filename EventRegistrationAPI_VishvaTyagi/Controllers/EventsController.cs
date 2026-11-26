@@ -1,6 +1,7 @@
 // Name: Vishva Tyagi
 // StudentId: 991811327
 
+using EventRegistrationAPI_VishvaTyagi.DTOs;
 using EventRegistrationAPI_VishvaTyagi.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -44,5 +45,15 @@ public class EventsController : ControllerBase
         }
 
         return Ok(campusEvent);
+    }
+
+    /// <summary>
+    /// Creates a new event from CreateEventDto. Invalid input returns 400 automatically.
+    /// </summary>
+    [HttpPost]
+    public async Task<IActionResult> Create(CreateEventDto dto)
+    {
+        var createdEvent = await _eventService.CreateAsync(dto);
+        return CreatedAtAction(nameof(GetById), new { id = createdEvent.EventId }, createdEvent);
     }
 }
