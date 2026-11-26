@@ -8,7 +8,8 @@ using Microsoft.AspNetCore.Mvc;
 namespace EventRegistrationAPI_VishvaTyagi.Controllers;
 
 /// <summary>
-/// API endpoints for campus events. All data access goes through IEventService.
+/// API endpoints for campus events. All data access goes through IEventService —
+/// the controller never uses the DbContext.
 /// </summary>
 [ApiController]
 [Route("api/[controller]")]
@@ -22,7 +23,7 @@ public class EventsController : ControllerBase
     }
 
     /// <summary>
-    /// Returns all events as DTOs, sorted by event date.
+    /// GET /api/events — returns all events as DTOs, sorted by event date (200).
     /// </summary>
     [HttpGet]
     public async Task<IActionResult> GetAll()
@@ -32,7 +33,7 @@ public class EventsController : ControllerBase
     }
 
     /// <summary>
-    /// Returns one event by id, or 404 if it does not exist.
+    /// GET /api/events/{id} — returns one event (200), or 404 if it does not exist.
     /// </summary>
     [HttpGet("{id:int}")]
     public async Task<IActionResult> GetById(int id)
@@ -48,7 +49,9 @@ public class EventsController : ControllerBase
     }
 
     /// <summary>
-    /// Creates a new event from CreateEventDto. Invalid input returns 400 automatically.
+    /// POST /api/events — creates an event from CreateEventDto.
+    /// Invalid input returns 400 automatically via [ApiController].
+    /// Success returns 201 with CreatedAtAction pointing at GetById.
     /// </summary>
     [HttpPost]
     public async Task<IActionResult> Create(CreateEventDto dto)

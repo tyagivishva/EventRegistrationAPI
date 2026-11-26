@@ -1,10 +1,13 @@
+// Name: Vishva Tyagi
+// StudentId: 991811327
+
 using System.ComponentModel.DataAnnotations;
 
 namespace EventRegistrationAPI_VishvaTyagi.Models;
 
 /// <summary>
 /// A campus event students and staff can register for.
-/// One event has many registrations.
+/// One event has many registrations (one-to-many).
 /// </summary>
 public class Event
 {

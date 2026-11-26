@@ -10,7 +10,7 @@ namespace EventRegistrationAPI_VishvaTyagi.Services;
 
 /// <summary>
 /// Handles database access and mapping for events.
-/// RegisteredCount and SpotsLeft are calculated from the registration collection.
+/// RegisteredCount and SpotsLeft are calculated values — they are not stored in the database.
 /// </summary>
 public class EventService : IEventService
 {
@@ -21,6 +21,9 @@ public class EventService : IEventService
         _context = context;
     }
 
+    /// <summary>
+    /// Returns every event as an EventDto, sorted by EventDate ascending.
+    /// </summary>
     public async Task<IEnumerable<EventDto>> GetAllAsync()
     {
         var events = await _context.Events
@@ -31,6 +34,9 @@ public class EventService : IEventService
         return events.Select(MapToDto);
     }
 
+    /// <summary>
+    /// Returns one event by id, or null when it does not exist.
+    /// </summary>
     public async Task<EventDto?> GetByIdAsync(int id)
     {
         var campusEvent = await _context.Events
@@ -40,6 +46,9 @@ public class EventService : IEventService
         return campusEvent == null ? null : MapToDto(campusEvent);
     }
 
+    /// <summary>
+    /// Creates a new event from CreateEventDto and returns the mapped EventDto.
+    /// </summary>
     public async Task<EventDto> CreateAsync(CreateEventDto dto)
     {
         var campusEvent = new Event

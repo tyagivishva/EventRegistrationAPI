@@ -1,3 +1,6 @@
+// Name: Vishva Tyagi
+// StudentId: 991811327
+
 using System.ComponentModel.DataAnnotations;
 
 namespace EventRegistrationAPI_VishvaTyagi.Models;

@@ -11,7 +11,8 @@ namespace EventRegistrationAPI_VishvaTyagi.Services;
 
 /// <summary>
 /// Handles registration database work, DTO mapping, and business rules.
-/// Rules are checked in assignment order: event exists, not past, no duplicate email, capacity.
+/// Rules are checked in assignment order so a duplicate email gets the duplicate
+/// message even when the event is also full.
 /// </summary>
 public class RegistrationService : IRegistrationService
 {
@@ -22,6 +23,9 @@ public class RegistrationService : IRegistrationService
         _context = context;
     }
 
+    /// <summary>
+    /// Returns registrations for an event, or null when the event id does not exist.
+    /// </summary>
     public async Task<IEnumerable<RegistrationDto>?> GetByEventIdAsync(int eventId)
     {
         var campusEvent = await _context.Events
@@ -36,9 +40,13 @@ public class RegistrationService : IRegistrationService
         return campusEvent.Registrations.Select(r => MapToDto(r, campusEvent.Title));
     }
 
+    /// <summary>
+    /// Registers a student for an event after enforcing the four business rules.
+    /// RegisteredOn is set here automatically — it is not part of CreateRegistrationDto.
+    /// </summary>
     public async Task<RegistrationDto> CreateAsync(int eventId, CreateRegistrationDto dto)
     {
-        // Rule 1: Event must exist
+        // Rule 1: Event must exist → 404
         var campusEvent = await _context.Events
             .Include(e => e.Registrations)
             .FirstOrDefaultAsync(e => e.EventId == eventId);
@@ -48,7 +56,7 @@ public class RegistrationService : IRegistrationService
             throw new BusinessRuleException("Event not found.", StatusCodes.Status404NotFound);
         }
 
-        // Rule 2: No past events
+        // Rule 2: No past events → 400
         if (campusEvent.EventDate < DateTime.Now)
         {
             throw new BusinessRuleException(
@@ -56,7 +64,8 @@ public class RegistrationService : IRegistrationService
                 StatusCodes.Status400BadRequest);
         }
 
-        // Rule 3: No duplicate email for this event (case-insensitive)
+        // Rule 3: No duplicate email for this event (case-insensitive) → 409
+        // Checked before capacity so a full event with a duplicate still returns the duplicate message.
         var emailAlreadyRegistered = campusEvent.Registrations
             .Any(r => string.Equals(r.Email, dto.Email, StringComparison.OrdinalIgnoreCase));
 
@@ -67,7 +76,7 @@ public class RegistrationService : IRegistrationService
                 StatusCodes.Status409Conflict);
         }
 
-        // Rule 4: Capacity — event is full when registration count equals capacity
+        // Rule 4: Capacity — event is full when registration count equals capacity → 409
         if (campusEvent.Registrations.Count >= campusEvent.Capacity)
         {
             throw new BusinessRuleException(
@@ -89,6 +98,9 @@ public class RegistrationService : IRegistrationService
         return MapToDto(registration, campusEvent.Title);
     }
 
+    /// <summary>
+    /// Cancels a registration. Deleting frees a spot so SpotsLeft goes up by one.
+    /// </summary>
     public async Task<bool> DeleteAsync(int id)
     {
         var registration = await _context.Registrations.FindAsync(id);
@@ -98,7 +110,6 @@ public class RegistrationService : IRegistrationService
             return false;
         }
 
-        // Cancelling a registration frees a spot for later registrations.
         _context.Registrations.Remove(registration);
         await _context.SaveChangesAsync();
         return true;

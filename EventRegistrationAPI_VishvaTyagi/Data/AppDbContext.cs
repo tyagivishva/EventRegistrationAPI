@@ -1,3 +1,6 @@
+// Name: Vishva Tyagi
+// StudentId: 991811327
+
 using EventRegistrationAPI_VishvaTyagi.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -19,13 +22,14 @@ public class AppDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        // One event has many registrations
         modelBuilder.Entity<Event>()
             .HasMany(e => e.Registrations)
             .WithOne(r => r.Event)
             .HasForeignKey(r => r.EventId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        // Event 1 is in the past. Event 3 has capacity 2 and two registrations, so it is full.
+        // Seed: Event 1 is in the past. Event 3 has capacity 2 and two registrations (full).
         // Events 2 and 4 are in 2027 and still have spots left.
         modelBuilder.Entity<Event>().HasData(
             new Event
