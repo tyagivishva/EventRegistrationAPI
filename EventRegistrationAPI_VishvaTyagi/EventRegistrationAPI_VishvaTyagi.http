@@ -1,0 +1,6 @@
+@EventRegistrationAPI_VishvaTyagi_HostAddress = http://localhost:5075
+
+GET {{EventRegistrationAPI_VishvaTyagi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
